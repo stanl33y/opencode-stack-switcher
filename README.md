@@ -67,8 +67,8 @@ Before installing OCS, make sure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/stanl/ocs.git
-cd ocs
+git clone https://github.com/stanl33y/opencode-stack-switcher.git
+cd opencode-stack-switcher
 
 # Install dependencies
 bun install

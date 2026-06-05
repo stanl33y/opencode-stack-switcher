@@ -82,4 +82,4 @@ JSON.parse(readFileSync(path, "utf8"))
 ### Contact
 
 - Security email: security-reports@yourdomain.com
-- GitHub: https://github.com/stanl/ocs/security/advisories
+- GitHub: https://github.com/stanl33y/opencode-stack-switcher/security/advisories

@@ -98,6 +98,6 @@ By contributing, you agree that your contributions will be licensed under the MI
 ## 💬 Questions?
 
 - Open a GitHub Discussion
-- Open a [GitHub Discussion](https://github.com/stanl/ocs/discussions)
+- Open a [GitHub Discussion](https://github.com/stanl33y/opencode-stack-switcher/discussions)
 
 Thank you for contributing! 🎉
