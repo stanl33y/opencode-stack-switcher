@@ -462,8 +462,46 @@
       }
     },
     "zai-coding-plan": {
+      "name": "Z.AI Coding Plan",
+      "npm": "@ai-sdk/openai-compatible",
       "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
         "apiKey": "$ZAI_API_KEY"
+      },
+      "models": {
+        "glm-4.7": {
+          "name": "GLM-4.7 (Z.AI Coding Plan)",
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "glm-5.1": {
+          "name": "GLM-5.1 (Z.AI Coding Plan)",
+          "limit": {
+            "context": 202752,
+            "output": 16384
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        },
+        "glm-4.5-air": {
+          "name": "GLM-4.5 Air (Z.AI Coding Plan)",
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
       }
     },
     "llama-rtx": {
