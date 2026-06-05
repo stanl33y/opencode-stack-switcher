@@ -1,0 +1,26 @@
+{
+  "name": "openrouter-eff",
+  "description": "OpenRouter — melhor custo/benefício (DeepSeek/Qwen/Gemini)",
+  "opencode": {
+    "model": "openrouter/deepseek/deepseek-v4-flash",
+    "small_model": "openrouter/google/gemini-2.5-flash-lite",
+    "agent": {
+      "build": { "model": "openrouter/deepseek/deepseek-v4-flash" },
+      "plan": { "model": "openrouter/deepseek/deepseek-v4-pro" }
+    }
+  },
+  "omo": {
+    "default_model": "openrouter/qwen/qwen3-coder",
+    "agents": {
+      "oracle": "openrouter/deepseek/deepseek-v4-pro",
+      "prometheus": "openrouter/deepseek/deepseek-v4-pro"
+    },
+    "categories": {
+      "ultrabrain": "openrouter/deepseek/deepseek-v4-pro",
+      "quick": "openrouter/google/gemini-2.5-flash-lite",
+      "unspecified-low": "openrouter/google/gemini-2.5-flash-lite"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}

@@ -1,0 +1,538 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "oh-my-openagent"
+  ],
+  "tools": {
+    "webfetch": true,
+    "websearch": true,
+    "google_search": true,
+    "ast_grep_search": true,
+    "background_output": true,
+    "lsp_diagnostics": true,
+    "todoread": true,
+    "todowrite": true,
+    "task": true,
+    "skill": true
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 4000
+  },
+  "agent": {
+    "build": {
+      "mode": "primary"
+    },
+    "plan": {
+      "mode": "primary"
+    },
+    "llama-rtx": {
+      "description": "Local RTX agent — long context, file editing, no internet (131K ctx, MTP)",
+      "model": "llama-rtx/qwen3.5-4b",
+      "mode": "all",
+      "prompt": "/no_think You are a local file editing agent. You ONLY use read, write, edit, and glob tools. Never use web search, fetch, or any external tools. When given a task, find the relevant files, read them, make the requested changes, done. Be direct and efficient.",
+      "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
+        "google_search": "deny",
+        "ast_grep_search": "deny",
+        "lsp_diagnostics": "deny",
+        "background_output": "deny",
+        "task": "deny",
+        "skill": "deny",
+        "ui_to_artifact": "deny",
+        "extract_text_from_screenshot": "deny",
+        "diagnose_error_screenshot": "deny",
+        "understand_technical_diagram": "deny",
+        "analyze_data_visualization": "deny",
+        "ui_diff_check": "deny",
+        "image_analysis": "deny",
+        "video_analysis": "deny",
+        "context7": "deny",
+        "grep_app": "deny",
+        "lsp": "deny",
+        "ast_grep": "deny"
+      }
+    },
+    "llama-igpu": {
+      "description": "Local iGPU agent — fast generation, short tasks, no internet (32K ctx)",
+      "model": "llama-igpu/qwen3.5-4b",
+      "mode": "all",
+      "prompt": "/no_think You are a local file editing agent. You ONLY use read, write, edit, and glob tools. Never use web search, fetch, or any external tools. When given a task, find the relevant files, read them, make the requested changes, done. Be direct and efficient.",
+      "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
+        "google_search": "deny",
+        "ast_grep_search": "deny",
+        "lsp_diagnostics": "deny",
+        "background_output": "deny",
+        "task": "deny",
+        "skill": "deny",
+        "ui_to_artifact": "deny",
+        "extract_text_from_screenshot": "deny",
+        "diagnose_error_screenshot": "deny",
+        "understand_technical_diagram": "deny",
+        "analyze_data_visualization": "deny",
+        "ui_diff_check": "deny",
+        "image_analysis": "deny",
+        "video_analysis": "deny",
+        "context7": "deny",
+        "grep_app": "deny",
+        "lsp": "deny",
+        "ast_grep": "deny"
+      }
+    }
+  },
+  "mcp": {
+    "zai-mcp-server": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@z_ai/mcp-server"
+      ],
+      "environment": {
+        "Z_AI_MODE": "ZAI",
+        "Z_AI_API_KEY": "$ZAI_API_KEY"
+      }
+    },
+    "web-search-prime": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer $ZAI_API_KEY"
+      }
+    },
+    "web-reader": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer $ZAI_API_KEY"
+      }
+    },
+    "zread": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer $ZAI_API_KEY"
+      }
+    }
+  },
+  "provider": {
+    "openai": {
+      "name": "OpenAI",
+      "npm": "@ai-sdk/openai",
+      "options": {
+        "apiKey": "$OPENAI_API_KEY"
+      },
+      "models": {
+        "gpt-5.5": {
+          "name": "GPT-5.5"
+        },
+        "gpt-5.5-fast": {
+          "name": "GPT-5.5 Fast",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          }
+        }
+      }
+    },
+    "zai": {
+      "models": {
+        "glm-4.7": {
+          "name": "GLM-4.7 (Z.AI)",
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        }
+      },
+      "name": "Z.AI",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4",
+        "apiKey": "$ZAI_API_KEY"
+      }
+    },
+    "deepproxy": {
+      "name": "DeepProxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:3001/v1"
+      },
+      "models": {
+        "deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash",
+          "limit": {
+            "context": 64000,
+            "output": 8000
+          }
+        },
+        "deepseek-v4-flash-thinking": {
+          "name": "DeepSeek V4 Flash Thinking",
+          "limit": {
+            "context": 64000,
+            "output": 8000
+          }
+        },
+        "deepseek-v4-pro": {
+          "name": "DeepSeek V4 Pro",
+          "limit": {
+            "context": 64000,
+            "output": 8000
+          }
+        },
+        "deepseek-v4-pro-thinking": {
+          "name": "DeepSeek V4 Pro Thinking",
+          "limit": {
+            "context": 64000,
+            "output": 8000
+          }
+        }
+      }
+    },
+    "kimiproxy": {
+      "name": "KimiProxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:3002/v1"
+      },
+      "models": {
+        "k2d6": {
+          "name": "Kimi K2D6"
+        },
+        "k2d6-thinking": {
+          "name": "Kimi K2D6 Thinking"
+        }
+      }
+    },
+    "qwenproxy": {
+      "name": "QwenProxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:3003/v1"
+      },
+      "models": {
+        "qwen3.6-plus": {
+          "name": "Qwen3.6 Plus"
+        },
+        "qwen3.7-max": {
+          "name": "Qwen3.7 Max"
+        },
+        "qwen-latest-series-invite-beta-v24": {
+          "name": "Qwen Latest Beta v24"
+        },
+        "qwen-latest-series-invite-beta-v16": {
+          "name": "Qwen Latest Beta v16"
+        },
+        "qwen3.6-max-preview": {
+          "name": "Qwen3.6 Max Preview"
+        },
+        "qwen3.6-27b": {
+          "name": "Qwen3.6 27B"
+        },
+        "qwen3.5-plus": {
+          "name": "Qwen3.5 Plus"
+        },
+        "qwen3.5-omni-plus": {
+          "name": "Qwen3.5 Omni Plus"
+        },
+        "qwen3.6-35b-a3b": {
+          "name": "Qwen3.6 35B A3B"
+        },
+        "qwen3.5-flash": {
+          "name": "Qwen3.5 Flash"
+        },
+        "qwen3.5-max-2026-03-08": {
+          "name": "Qwen3.5 Max"
+        },
+        "qwen3.6-plus-preview": {
+          "name": "Qwen3.6 Plus Preview"
+        },
+        "qwen3.5-397b-a17b": {
+          "name": "Qwen3.5 397B A17B"
+        },
+        "qwen3.5-122b-a10b": {
+          "name": "Qwen3.5 122B A10B"
+        },
+        "qwen3.5-omni-flash": {
+          "name": "Qwen3.5 Omni Flash"
+        },
+        "qwen3.5-27b": {
+          "name": "Qwen3.5 27B"
+        },
+        "qwen3.5-35b-a3b": {
+          "name": "Qwen3.5 35B A3B"
+        },
+        "qwen3-max-2026-01-23": {
+          "name": "Qwen3 Max"
+        },
+        "qwen-plus-2025-07-28": {
+          "name": "Qwen Plus"
+        },
+        "qwen3-coder-plus": {
+          "name": "Qwen3 Coder Plus"
+        },
+        "qwen3-vl-plus": {
+          "name": "Qwen3 VL Plus"
+        },
+        "qwen3-omni-flash-2025-12-01": {
+          "name": "Qwen3 Omni Flash"
+        },
+        "qwen-max-latest": {
+          "name": "Qwen Max Latest"
+        },
+        "qwen3.6-plus-no-thinking": {
+          "name": "Qwen3.6 Plus (no-thinking)"
+        },
+        "qwen3.7-max-no-thinking": {
+          "name": "Qwen3.7 Max (no-thinking)"
+        },
+        "qwen-latest-series-invite-beta-v24-no-thinking": {
+          "name": "Qwen Latest Beta v24 (no-thinking)"
+        },
+        "qwen-latest-series-invite-beta-v16-no-thinking": {
+          "name": "Qwen Latest Beta v16 (no-thinking)"
+        },
+        "qwen3.6-max-preview-no-thinking": {
+          "name": "Qwen3.6 Max Preview (no-thinking)"
+        },
+        "qwen3.6-27b-no-thinking": {
+          "name": "Qwen3.6 27B (no-thinking)"
+        },
+        "qwen3.5-plus-no-thinking": {
+          "name": "Qwen3.5 Plus (no-thinking)"
+        },
+        "qwen3.5-omni-plus-no-thinking": {
+          "name": "Qwen3.5 Omni Plus (no-thinking)"
+        },
+        "qwen3.6-35b-a3b-no-thinking": {
+          "name": "Qwen3.6 35B A3B (no-thinking)"
+        },
+        "qwen3.5-flash-no-thinking": {
+          "name": "Qwen3.5 Flash (no-thinking)"
+        },
+        "qwen3.5-max-2026-03-08-no-thinking": {
+          "name": "Qwen3.5 Max (no-thinking)"
+        },
+        "qwen3.6-plus-preview-no-thinking": {
+          "name": "Qwen3.6 Plus Preview (no-thinking)"
+        },
+        "qwen3.5-397b-a17b-no-thinking": {
+          "name": "Qwen3.5 397B A17B (no-thinking)"
+        },
+        "qwen3.5-122b-a10b-no-thinking": {
+          "name": "Qwen3.5 122B A10B (no-thinking)"
+        },
+        "qwen3.5-omni-flash-no-thinking": {
+          "name": "Qwen3.5 Omni Flash (no-thinking)"
+        },
+        "qwen3.5-27b-no-thinking": {
+          "name": "Qwen3.5 27B (no-thinking)"
+        },
+        "qwen3.5-35b-a3b-no-thinking": {
+          "name": "Qwen3.5 35B A3B (no-thinking)"
+        },
+        "qwen3-max-2026-01-23-no-thinking": {
+          "name": "Qwen3 Max (no-thinking)"
+        },
+        "qwen-plus-2025-07-28-no-thinking": {
+          "name": "Qwen Plus (no-thinking)"
+        },
+        "qwen3-coder-plus-no-thinking": {
+          "name": "Qwen3 Coder Plus (no-thinking)"
+        },
+        "qwen3-vl-plus-no-thinking": {
+          "name": "Qwen3 VL Plus (no-thinking)"
+        },
+        "qwen3-omni-flash-2025-12-01-no-thinking": {
+          "name": "Qwen3 Omni Flash (no-thinking)"
+        },
+        "qwen-max-latest-no-thinking": {
+          "name": "Qwen Max Latest (no-thinking)"
+        }
+      }
+    },
+    "ollama": {
+      "models": {
+        "deepseek-v4-pro:cloud": {
+          "name": "deepseek-v4-pro:cloud"
+        },
+        "deepseek-v4-flash:cloud": {
+          "name": "deepseek-v4-flash:cloud"
+        },
+        "gemma4:cloud": {
+          "_launch": true,
+          "name": "gemma4:cloud"
+        },
+        "gemini-3-flash-preview:cloud": {
+          "_launch": true,
+          "name": "gemini-3-flash-preview:cloud",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "glm-4.7-flash:latest": {
+          "_launch": true,
+          "name": "glm-4.7-flash:latest"
+        },
+        "glm-5:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 202752,
+            "output": 16384
+          },
+          "name": "glm-5:cloud"
+        },
+        "glm-5.1:cloud": {
+          "_launch": true,
+          "name": "glm-5.1:cloud"
+        },
+        "gpt-oss:20b": {
+          "name": "gpt-oss:20b"
+        },
+        "kimi-k2.5:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          },
+          "name": "kimi-k2.5:cloud"
+        },
+        "kimi-k2.6:cloud": {
+          "_launch": true,
+          "name": "kimi-k2.6:cloud"
+        },
+        "minimax-m2.5:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 204800,
+            "output": 16384
+          },
+          "name": "minimax-m2.5:cloud"
+        },
+        "minimax-m2.7:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 40960,
+            "output": 8192
+          },
+          "name": "minimax-m2.7:cloud"
+        },
+        "nemotron-3-super:cloud": {
+          "_launch": true,
+          "name": "nemotron-3-super:cloud"
+        },
+        "qwen3-coder-next:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          },
+          "name": "qwen3-coder-next:cloud"
+        },
+        "qwen3.5:397b-cloud": {
+          "_launch": true,
+          "name": "qwen3.5:397b-cloud"
+        },
+        "qwen3.5:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          },
+          "name": "qwen3.5:cloud"
+        }
+      },
+      "name": "Ollama",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      }
+    },
+    "zai-coding-plan": {
+      "options": {
+        "apiKey": "$ZAI_API_KEY"
+      }
+    },
+    "llama-rtx": {
+      "name": "LLaMA RTX (CUDA)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:8080/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "qwen3.5-4b": {
+          "name": "Qwen3.5-4B RTX — 131K ctx, MTP",
+          "limit": {
+            "context": 131072,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "llama-igpu": {
+      "name": "LLaMA iGPU (Vulkan)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:8081/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "qwen3.5-4b": {
+          "name": "Qwen3.5-4B iGPU — 65K ctx, fast tg",
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "vastai-qwen": {
+      "name": "Vast.ai — Qwen3.6 35B (vLLM GPU)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:8081/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "Qwen/Qwen3.6-35B-A3B": {
+          "name": "Qwen3.6-35B-A3B — 262K ctx, MoE, 216K KV",
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        }
+      }
+    },
+    "vastai-v100": {
+      "name": "Vast.ai — RTX Pro 5000 Qwen3.5 35B (llama.cpp)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:8082/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "unsloth/Qwen3.5-35B-A3B-GGUF:UD-Q5_K_XL": {
+          "name": "Qwen3.5-35B-A3B Q5 — 262K ctx, llama.cpp CPU",
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        }
+      }
+    }
+  }
+}

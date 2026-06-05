@@ -1,0 +1,49 @@
+{
+  "_comment": "Example safe stack for OCS. No secrets included.",
+  "name": "example",
+  "description": "Example stack using OpenAI GPT-4o as default. Configure your API keys via environment variables.",
+  "opencode": {
+    "model": "openai:gpt-4o",
+    "small_model": "openai:gpt-4o-mini"
+  },
+  "omo": {
+    "default_model": "openai:gpt-4o-mini",
+    "agents": {
+      "sisyphus": "openai:gpt-4o",
+      "hephaestus": "openai:gpt-4o",
+      "oracle": "openai:gpt-4o",
+      "librarian": "openai:gpt-4o",
+      "explore": "openai:gpt-4o-mini",
+      "multimodal-looker": "openai:gpt-4o",
+      "prometheus": "openai:gpt-4o",
+      "metis": "openai:gpt-4o",
+      "momus": "openai:gpt-4o",
+      "atlas": "openai:gpt-4o-mini",
+      "sisyphus-junior": "openai:gpt-4o-mini",
+      "llama": "openai:gpt-4o-mini"
+    },
+    "categories": {
+      "visual-engineering": "openai:gpt-4o",
+      "ultrabrain": "openai:o1-preview",
+      "artistry": "openai:gpt-4o",
+      "quick": "openai:gpt-4o-mini",
+      "unspecified-low": "openai:gpt-4o-mini",
+      "unspecified-high": "openai:gpt-4o",
+      "writing": "openai:gpt-4o"
+    }
+  },
+  "_prelaunch_example": [
+    {
+      "name": "mcp-server",
+      "check": {
+        "tcp": 3000
+      },
+      "start": "node server/index.js",
+      "cwd": "./mcp-server",
+      "timeoutMs": 30000
+    }
+  ],
+  "_env_example": {
+    "CUSTOM_VAR": "example_value"
+  }
+}

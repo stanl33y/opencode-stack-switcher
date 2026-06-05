@@ -1,0 +1,26 @@
+{
+  "name": "openrouter-free",
+  "description": "Modelos free (custo zero)",
+  "opencode": {
+    "model": "opencode/deepseek-v4-flash-free",
+    "small_model": "opencode/mimo-v2.5-free",
+    "agent": {
+      "build": { "model": "opencode/deepseek-v4-flash-free" },
+      "plan": { "model": "opencode/nemotron-3-ultra-free" }
+    }
+  },
+  "omo": {
+    "default_model": "opencode/deepseek-v4-flash-free",
+    "agents": {
+      "oracle": "opencode/nemotron-3-ultra-free",
+      "prometheus": "opencode/nemotron-3-ultra-free"
+    },
+    "categories": {
+      "ultrabrain": "opencode/nemotron-3-ultra-free",
+      "quick": "opencode/mimo-v2.5-free",
+      "unspecified-low": "opencode/mimo-v2.5-free"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}

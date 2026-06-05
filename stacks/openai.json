@@ -1,0 +1,27 @@
+{
+  "name": "openai",
+  "description": "Somente modelos OpenAI (GPT-5.5)",
+  "opencode": {
+    "model": "openai/gpt-5.5",
+    "small_model": "openai/gpt-5.5-fast",
+    "agent": {
+      "build": { "model": "openai/gpt-5.5" },
+      "plan": { "model": "openai/gpt-5.5" }
+    }
+  },
+  "omo": {
+    "default_model": "openai/gpt-5.5-fast",
+    "agents": {
+      "oracle": "openai/gpt-5.5",
+      "prometheus": "openai/gpt-5.5",
+      "metis": "openai/gpt-5.5"
+    },
+    "categories": {
+      "ultrabrain": "openai/gpt-5.5",
+      "quick": "openai/gpt-5.5-fast",
+      "unspecified-low": "openai/gpt-5.5-fast"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}

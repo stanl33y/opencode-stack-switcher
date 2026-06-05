@@ -1,0 +1,18 @@
+{
+  "name": "ocs",
+  "version": "0.1.0",
+  "description": "OpenCode Stack Switcher — troca stacks de modelos (agents/subagents/categories) e lança o opencode",
+  "type": "module",
+  "bin": {
+    "ocs": "./src/cli.ts"
+  },
+  "scripts": {
+    "ocs": "bun run src/cli.ts"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "1.2.15"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

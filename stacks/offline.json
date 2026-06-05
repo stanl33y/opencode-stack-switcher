@@ -1,0 +1,46 @@
+{
+  "name": "offline",
+  "description": "Local/offline — llama.cpp RTX+iGPU, sem internet",
+  "opencode": {
+    "model": "llama-rtx/qwen3.5-4b",
+    "small_model": "llama-igpu/qwen3.5-4b",
+    "agent": {
+      "build": {
+        "model": "llama-rtx/qwen3.5-4b",
+        "permission": { "webfetch": "deny", "websearch": "deny", "google_search": "deny" }
+      },
+      "plan": {
+        "model": "llama-rtx/qwen3.5-4b",
+        "permission": { "webfetch": "deny", "websearch": "deny", "google_search": "deny" }
+      }
+    }
+  },
+  "omo": {
+    "default_model": "llama-rtx/qwen3.5-4b",
+    "categories": {
+      "quick": "llama-igpu/qwen3.5-4b",
+      "unspecified-low": "llama-igpu/qwen3.5-4b"
+    }
+  },
+  "prelaunch": [
+    {
+      "name": "llama-rtx",
+      "check": { "tcp": 8080 },
+      "start": "",
+      "timeoutMs": 90000
+    },
+    {
+      "name": "llama-igpu",
+      "check": { "tcp": 8081 },
+      "start": "",
+      "timeoutMs": 90000
+    },
+    {
+      "name": "ollama",
+      "check": { "tcp": 11434 },
+      "start": "",
+      "timeoutMs": 30000
+    }
+  ],
+  "env": {}
+}

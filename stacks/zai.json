@@ -1,0 +1,27 @@
+{
+  "name": "zai",
+  "description": "Tudo no zai-coding-plan (GLM)",
+  "opencode": {
+    "model": "zai-coding-plan/glm-5.1",
+    "small_model": "zai-coding-plan/glm-4.5-air",
+    "agent": {
+      "build": { "model": "zai-coding-plan/glm-5.1" },
+      "plan": { "model": "zai-coding-plan/glm-5.1" }
+    }
+  },
+  "omo": {
+    "default_model": "zai-coding-plan/glm-4.7",
+    "agents": {
+      "oracle": "zai-coding-plan/glm-5.1",
+      "prometheus": "zai-coding-plan/glm-5.1",
+      "metis": "zai-coding-plan/glm-5.1"
+    },
+    "categories": {
+      "ultrabrain": "zai-coding-plan/glm-5.1",
+      "quick": "zai-coding-plan/glm-4.5-air",
+      "unspecified-low": "zai-coding-plan/glm-4.5-air"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}

@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Generated configs
+resolved/
+
+# Private stacks (user-specific with secrets)
+*.local.json
+
+# Sensitive patterns
+stacks/*-secret*.json
+stacks/*-private*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
