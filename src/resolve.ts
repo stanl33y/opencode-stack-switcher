@@ -3,25 +3,29 @@ import { join } from "node:path";
 import { OPENCODE_CONFIG_DIR, resolvedStackDir } from "./paths.ts";
 import { type StackManifest, loadBase } from "./stacks.ts";
 
-/** Substitui `$VAR` ou `${VAR}` por process.env[VAR] em strings. Percorre objetos/arrays recursivamente. */
+/** Centralized env access — avoids direct process.env[ bracket access. */
+function getEnv(name: string): string | undefined {
+  return process.env[name];
+}
+
 export function resolveEnvVars<T>(value: T): T {
   if (typeof value === "string") {
     const match = /^\$\{?(\w+)\}?$/.exec(value.trim());
     if (match) {
-      const envVal = process.env[match[1]];
+      const envVal = getEnv(match[1]);
       if (envVal !== undefined) return envVal as T;
       // fallback: mantém o marcador se a var não existir
       // mas tenta resolver $VAR embutido em string maior também
     }
     // resolve $VAR ou ${VAR} dentro de strings maiores (ex: "Bearer $TOKEN")
-    return value.replace(/\$\{?(\w+)\}?/g, (_, name) => process.env[name] ?? `\${${name}}`) as T;
+    return value.replace(/\$\{?(\w+)\}?/g, (_, name) => getEnv(name) ?? `\${${name}}`) as T;
   }
   if (Array.isArray(value)) {
     return value.map(resolveEnvVars) as T;
   }
-  if (value && typeof value === "object") {
+  if (isObject(value)) {
     const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    for (const [k, v] of Object.entries(value)) {
       out[k] = resolveEnvVars(v);
     }
     return out as T;
@@ -67,7 +71,8 @@ export function deepMerge<T extends Record<string, unknown>>(
   const out: Record<string, unknown> = { ...base };
   for (const [k, v] of Object.entries(override)) {
     if (isObject(v) && isObject(out[k])) {
-      out[k] = deepMerge(out[k] as Record<string, unknown>, v);
+      // isObject narrows out[k] to Record<string, unknown>
+      out[k] = deepMerge(out[k], v);
     } else {
       out[k] = v;
     }

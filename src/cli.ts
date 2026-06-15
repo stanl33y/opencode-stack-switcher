@@ -2,6 +2,7 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { API_KEY_NAMES, getDefaultEditor, isApiKeySet } from "./config.ts";
 import { parseJsonc } from "./jsonc.ts";
 import { launchOpencode } from "./launch.ts";
 import { currentStack, pickStack } from "./menu.ts";
@@ -79,10 +80,9 @@ async function cmdDoctor() {
   console.log(
     `base.json: ${existsSync(join(STACKS_DIR, "base.json")) ? "ok" : "AUSENTE — rode 'ocs init'"}`,
   );
-  const keys = ["ZAI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"];
   console.log("\nVariáveis de ambiente de provider:");
-  for (const k of keys) {
-    console.log(`  ${k}: ${process.env[k] ? "definida" : "—"}`);
+  for (const k of API_KEY_NAMES) {
+    console.log(`  ${k}: ${isApiKeySet(k) ? "definida" : "—"}`);
   }
   console.log("\nPrelaunch por stack (health-check):");
   for (const name of listStackNames()) {
@@ -99,7 +99,7 @@ function cmdEdit(name: string) {
     console.error(`Stack '${name}' não existe (${path}).`);
     process.exit(1);
   }
-  const editor = process.env.EDITOR || (process.platform === "win32" ? "notepad" : "vi");
+  const editor = getDefaultEditor();
   const child = spawn(editor, [path], { stdio: "inherit", shell: process.platform === "win32" });
   child.on("exit", (code) => process.exit(code ?? 0));
 }

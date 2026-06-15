@@ -1,31 +1,11 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { BaseConfigMissingError, StackNotFoundError } from "./errors.ts";
 import { STACKS_DIR, stackManifestPath } from "./paths.ts";
+import { BaseConfigSchema, type StackManifest, StackManifestSchema } from "./schemas.ts";
 
-export interface PrelaunchEntry {
-  name: string;
-  /** Porta TCP para health-check (alternativa a `url`). */
-  check: { tcp?: number; url?: string };
-  /** Comando de shell para subir o servidor. Vazio => só health-check/aviso. */
-  start?: string;
-  cwd?: string;
-  timeoutMs?: number;
-}
-
-export interface StackManifest {
-  name: string;
-  description: string;
-  /** Overlay deep-merged em base.json -> opencode.json da stack. */
-  opencode?: Record<string, unknown>;
-  /** Mapa de modelos do plugin oh-my-openagent. */
-  omo?: {
-    default_model?: string;
-    agents?: Record<string, string>;
-    categories?: Record<string, string>;
-  };
-  prelaunch?: PrelaunchEntry[];
-  env?: Record<string, string>;
-}
+// Re-export types for backward compatibility
+export type { PrelaunchEntry, StackManifest } from "./schemas.ts";
 
 export function listStackNames(): string[] {
   if (!existsSync(STACKS_DIR)) return [];
@@ -38,17 +18,18 @@ export function listStackNames(): string[] {
 export function loadStack(name: string): StackManifest {
   const path = stackManifestPath(name);
   if (!existsSync(path)) {
-    throw new Error(`Stack '${name}' não existe (${path}). Use 'ocs list'.`);
+    throw new StackNotFoundError(name, path);
   }
-  const manifest = JSON.parse(readFileSync(path, "utf8")) as StackManifest;
-  if (!manifest.name) manifest.name = name;
-  return manifest;
+  const raw = JSON.parse(readFileSync(path, "utf8"));
+  // Preserve original behavior: fill in name from parameter if missing
+  if (!raw.name) raw.name = name;
+  return StackManifestSchema.parse(raw);
 }
 
 export function loadBase(): Record<string, unknown> {
   const basePath = join(STACKS_DIR, "base.json");
   if (!existsSync(basePath)) {
-    throw new Error(`stacks/base.json ausente — rode 'ocs init' para gerá-lo do config atual.`);
+    throw new BaseConfigMissingError();
   }
-  return JSON.parse(readFileSync(basePath, "utf8")) as Record<string, unknown>;
+  return BaseConfigSchema.parse(JSON.parse(readFileSync(basePath, "utf8")));
 }

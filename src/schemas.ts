@@ -5,7 +5,7 @@ import { z } from "zod";
  * Maps environment variable names to their string values.
  * Values can include variable references like $VAR or ${VAR}.
  */
-export const EnvVarsSchema = z.record(z.string());
+export const EnvVarsSchema = z.record(z.string(), z.string());
 
 /**
  * Inferred type from EnvVarsSchema.
@@ -42,7 +42,7 @@ export type PrelaunchEntry = z.infer<typeof PrelaunchEntrySchema>;
  * Schema for base config overlay in opencode.json.
  * Accepts arbitrary keys since opencode config is flexible.
  */
-export const BaseConfigSchema = z.record(z.unknown());
+export const BaseConfigSchema = z.record(z.string(), z.unknown());
 
 /**
  * Inferred type from BaseConfigSchema.
@@ -57,8 +57,8 @@ export type BaseConfig = z.infer<typeof BaseConfigSchema>;
 export const OmoConfigSchema = z
   .object({
     default_model: z.string().optional(),
-    agents: z.record(z.string()).optional(),
-    categories: z.record(z.string()).optional(),
+    agents: z.record(z.string(), z.string()).optional(),
+    categories: z.record(z.string(), z.string()).optional(),
   })
   .passthrough();
 
