@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License">
   <img src="https://img.shields.io/badge/bun-%3E%3D1.0-black?logo=bun" alt="Bun">
   <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/github/actions/workflow/status/stanl33y/opencode-stack-switcher/ci.yml?branch=main" alt="CI">
 </p>
 
 Manage and switch OpenCode configuration stacks (AI models for agents, subagents, and categories).
