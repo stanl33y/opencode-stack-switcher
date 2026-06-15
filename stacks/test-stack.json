@@ -1,0 +1,21 @@
+{
+  "_comment": "Test fixture stack for golden file testing. No secrets included.",
+  "name": "test-stack",
+  "description": "Test fixture for CLI golden file characterization",
+  "opencode": {
+    "model": "openai:gpt-4o",
+    "small_model": "openai:gpt-4o-mini"
+  },
+  "omo": {
+    "default_model": "openai:gpt-4o-mini",
+    "agents": {
+      "oracle": "openai:gpt-4o",
+      "sisyphus": "openai:gpt-4o",
+      "explore": "openai:gpt-4o-mini"
+    },
+    "categories": {
+      "quick": "openai:gpt-4o-mini",
+      "unspecified-high": "openai:gpt-4o"
+    }
+  }
+}
