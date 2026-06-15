@@ -7,12 +7,28 @@
     "ocs": "./src/cli.ts"
   },
   "scripts": {
-    "ocs": "bun run src/cli.ts"
+    "ocs": "bun run src/cli.ts",
+    "dev": "bun run --watch src/cli.ts",
+    "build": "bun build src/cli.ts --outdir dist --target bun",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
+    "format": "biome format --write src",
+    "prepublishOnly": "bun run typecheck && bun run lint && bun test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,json}": ["biome check --write"]
   },
   "dependencies": {
-    "@opencode-ai/plugin": "1.2.15"
+    "@opencode-ai/plugin": "^1.17.7"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@biomejs/biome": "1.8.3",
+    "@types/bun": "1.3.14",
+    "husky": "9.1.4",
+    "lint-staged": "15.2.2"
   }
 }
