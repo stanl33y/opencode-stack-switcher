@@ -1,7 +1,7 @@
-import { createInterface } from "node:readline/promises";
 import { existsSync, readFileSync } from "node:fs";
-import { listStackNames, loadStack } from "./stacks.ts";
+import { createInterface } from "node:readline/promises";
 import { CURRENT_FILE } from "./paths.ts";
+import { listStackNames, loadStack } from "./stacks.ts";
 
 export function currentStack(): string | null {
   if (!existsSync(CURRENT_FILE)) return null;

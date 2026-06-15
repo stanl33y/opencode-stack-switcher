@@ -2,13 +2,13 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { OPENCODE_CONFIG_DIR, STACKS_DIR } from "./paths.ts";
-import { listStackNames, loadStack } from "./stacks.ts";
 import { parseJsonc } from "./jsonc.ts";
-import { resolveStack } from "./resolve.ts";
-import { runPrelaunch } from "./prelaunch.ts";
 import { launchOpencode } from "./launch.ts";
-import { pickStack, currentStack } from "./menu.ts";
+import { currentStack, pickStack } from "./menu.ts";
+import { OPENCODE_CONFIG_DIR, STACKS_DIR } from "./paths.ts";
+import { runPrelaunch } from "./prelaunch.ts";
+import { resolveStack } from "./resolve.ts";
+import { listStackNames, loadStack } from "./stacks.ts";
 
 function splitArgs(argv: string[]): { args: string[]; passthrough: string[] } {
   const sep = argv.indexOf("--");
@@ -58,10 +58,13 @@ function cmdShow(name: string) {
   const { opencode, omo, dir } = resolveStack(manifest);
   console.log(`# resolved/${name}  (${dir})\n`);
   console.log("## opencode.json (model/small_model/agent)");
-  console.log(JSON.stringify(
-    { model: opencode.model, small_model: opencode.small_model, agent: opencode.agent },
-    null, 2,
-  ));
+  console.log(
+    JSON.stringify(
+      { model: opencode.model, small_model: opencode.small_model, agent: opencode.agent },
+      null,
+      2,
+    ),
+  );
   console.log("\n## oh-my-opencode.json");
   console.log(JSON.stringify(omo, null, 2));
 }
@@ -73,7 +76,9 @@ function cmdCurrent() {
 
 async function cmdDoctor() {
   console.log(`Config dir global: ${OPENCODE_CONFIG_DIR}`);
-  console.log(`base.json: ${existsSync(join(STACKS_DIR, "base.json")) ? "ok" : "AUSENTE — rode 'ocs init'"}`);
+  console.log(
+    `base.json: ${existsSync(join(STACKS_DIR, "base.json")) ? "ok" : "AUSENTE — rode 'ocs init'"}`,
+  );
   const keys = ["ZAI_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"];
   console.log("\nVariáveis de ambiente de provider:");
   for (const k of keys) {
@@ -111,7 +116,9 @@ function cmdInit() {
   delete cfg.small_model;
   const out = join(STACKS_DIR, "base.json");
   writeFileSync(out, JSON.stringify(cfg, null, 2) + "\n");
-  console.log(`base.json gerado: ${out}\n(providers/mcp/tools/plugin preservados; model/small_model removidos)`);
+  console.log(
+    `base.json gerado: ${out}\n(providers/mcp/tools/plugin preservados; model/small_model removidos)`,
+  );
 }
 
 function usage() {
@@ -139,23 +146,49 @@ async function main() {
       break;
     }
     case "use":
-      if (!arg) { console.error("uso: ocs use <stack>"); process.exit(1); }
+      if (!arg) {
+        console.error("uso: ocs use <stack>");
+        process.exit(1);
+      }
       await cmdUse(arg, passthrough);
       break;
-    case "list": cmdList(); break;
+    case "list":
+      cmdList();
+      break;
     case "show":
-      if (!arg) { console.error("uso: ocs show <stack>"); process.exit(1); }
-      cmdShow(arg); break;
-    case "current": cmdCurrent(); break;
-    case "doctor": await cmdDoctor(); break;
+      if (!arg) {
+        console.error("uso: ocs show <stack>");
+        process.exit(1);
+      }
+      cmdShow(arg);
+      break;
+    case "current":
+      cmdCurrent();
+      break;
+    case "doctor":
+      await cmdDoctor();
+      break;
     case "edit":
-      if (!arg) { console.error("uso: ocs edit <stack>"); process.exit(1); }
-      cmdEdit(arg); break;
-    case "init": cmdInit(); break;
-    case "help": case "-h": case "--help": usage(); break;
+      if (!arg) {
+        console.error("uso: ocs edit <stack>");
+        process.exit(1);
+      }
+      cmdEdit(arg);
+      break;
+    case "init":
+      cmdInit();
+      break;
+    case "help":
+    case "-h":
+    case "--help":
+      usage();
+      break;
     default:
       // atalho: `ocs <stack>` == `ocs use <stack>`
-      if (listStackNames().includes(cmd)) { await cmdUse(cmd, passthrough); break; }
+      if (listStackNames().includes(cmd)) {
+        await cmdUse(cmd, passthrough);
+        break;
+      }
       console.error(`comando desconhecido: ${cmd}`);
       usage();
       process.exit(1);

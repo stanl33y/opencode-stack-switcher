@@ -1,7 +1,7 @@
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { resolvedStackDir, OPENCODE_CONFIG_DIR } from "./paths.ts";
-import { loadBase, type StackManifest } from "./stacks.ts";
+import { OPENCODE_CONFIG_DIR, resolvedStackDir } from "./paths.ts";
+import { type StackManifest, loadBase } from "./stacks.ts";
 
 /** Substitui `$VAR` ou `${VAR}` por process.env[VAR] em strings. Percorre objetos/arrays recursivamente. */
 export function resolveEnvVars<T>(value: T): T {
@@ -31,13 +31,28 @@ export function resolveEnvVars<T>(value: T): T {
 
 // Conjunto fixo de agents/categories do oh-my-openagent (extraído do schema/config atual).
 export const OMO_AGENTS = [
-  "llama", "sisyphus", "hephaestus", "oracle", "librarian", "explore",
-  "multimodal-looker", "prometheus", "metis", "momus", "atlas", "sisyphus-junior",
+  "llama",
+  "sisyphus",
+  "hephaestus",
+  "oracle",
+  "librarian",
+  "explore",
+  "multimodal-looker",
+  "prometheus",
+  "metis",
+  "momus",
+  "atlas",
+  "sisyphus-junior",
 ] as const;
 
 export const OMO_CATEGORIES = [
-  "visual-engineering", "ultrabrain", "artistry", "quick",
-  "unspecified-low", "unspecified-high", "writing",
+  "visual-engineering",
+  "ultrabrain",
+  "artistry",
+  "quick",
+  "unspecified-low",
+  "unspecified-high",
+  "writing",
 ] as const;
 
 function isObject(v: unknown): v is Record<string, unknown> {
@@ -45,7 +60,10 @@ function isObject(v: unknown): v is Record<string, unknown> {
 }
 
 /** Deep-merge: `override` vence; objetos mesclam, arrays/escalares substituem. */
-export function deepMerge<T extends Record<string, unknown>>(base: T, override: Record<string, unknown>): T {
+export function deepMerge<T extends Record<string, unknown>>(
+  base: T,
+  override: Record<string, unknown>,
+): T {
   const out: Record<string, unknown> = { ...base };
   for (const [k, v] of Object.entries(override)) {
     if (isObject(v) && isObject(out[k])) {
@@ -74,7 +92,8 @@ export function buildOmoConfig(manifest: StackManifest): Record<string, unknown>
   }
 
   return {
-    $schema: "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+    $schema:
+      "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
     sisyphus_agent: { replace_plan: false },
     agents,
     categories,
@@ -97,14 +116,14 @@ export function resolveStack(manifest: StackManifest): ResolveResult {
   mkdirSync(dir, { recursive: true });
   // resolve $VAR antes de escrever o config — senão o OpenCode pode não resolver
   const opencodeResolved = resolveEnvVars(opencode);
-  writeFileSync(join(dir, "opencode.json"), JSON.stringify(opencodeResolved, null, 2) + "\n");
-  writeFileSync(join(dir, "oh-my-opencode.json"), JSON.stringify(omo, null, 2) + "\n");
+  writeFileSync(join(dir, "opencode.json"), `${JSON.stringify(opencodeResolved, null, 2)}\n`);
+  writeFileSync(join(dir, "oh-my-opencode.json"), `${JSON.stringify(omo, null, 2)}\n`);
 
   // package.json com a dep do plugin — necessário p/ o plugin resolver neste dir.
   const globalPkg = join(OPENCODE_CONFIG_DIR, "package.json");
   const pkgContent = existsSync(globalPkg)
     ? readFileSync(globalPkg, "utf8")
-    : JSON.stringify({ dependencies: { "@opencode-ai/plugin": "1.2.15" } }, null, 2) + "\n";
+    : `${JSON.stringify({ dependencies: { "@opencode-ai/plugin": "^1.17.7" } }, null, 2)}\n`;
   writeFileSync(join(dir, "package.json"), pkgContent);
 
   return { dir, opencode, omo };

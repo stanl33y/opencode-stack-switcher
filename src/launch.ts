@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { CURRENT_FILE } from "./paths.ts";
 import type { StackManifest } from "./stacks.ts";

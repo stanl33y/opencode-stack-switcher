@@ -77,6 +77,54 @@ bun install
 bun link
 ```
 
+## 🛠️ Development Setup
+
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your API keys and preferences:
+
+```bash
+# API Keys (set at least one based on your stacks)
+OPENAI_API_KEY=sk-your-openai-key
+OPENROUTER_API_KEY=sk-or-your-openrouter-key
+ZAI_API_KEY=zai-your-zai-key
+
+# Optional: Editor for `ocs edit` command (defaults to $EDITOR, then 'vi')
+EDITOR=code
+
+# Optional: OpenCode config dir override (defaults to ~/.config/opencode)
+# OPENCODE_CONFIG_DIR=/custom/path
+```
+
+### Cold Install Verification
+
+Test the installation process from scratch using the verification script:
+
+```bash
+# Run cold install verification (requires Git and Bun)
+chmod +x scripts/verify-cold-install.sh
+./scripts/verify-cold-install.sh
+```
+
+This script will:
+1. Clone the repository to a temporary directory
+2. Install dependencies with `bun install`
+3. Initialize OCS with `ocs init`
+4. Test basic functionality with `ocs list`
+5. Report success or failures
+
+### Development Tips
+
+- Always run `ocs doctor` to check system health
+- Use `ocs edit <stack>` to modify stack manifests with your preferred editor
+- The verification script ensures the project can be set up from scratch without any prior configuration
+
 ## 🚀 Usage
 
 ### Commands
