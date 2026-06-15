@@ -1,0 +1,67 @@
+{
+  "name": "headroom-zai",
+  "description": "Z.AI Coding Plan (GLM) via headroom proxy (localhost:8788)",
+  "opencode": {
+    "model": "headroom/glm-5.2",
+    "small_model": "headroom/glm-4.5-air",
+    "agent": {
+      "build": { "model": "headroom/glm-5.2" },
+      "plan": { "model": "headroom/glm-5.2" }
+    },
+    "provider": {
+      "headroom": {
+        "name": "Headroom → Z.AI",
+        "npm": "@ai-sdk/openai-compatible",
+        "options": {
+          "baseURL": "http://localhost:8989/v1",
+          "apiKey": "$ZAI_API_KEY"
+        },
+        "models": {
+          "glm-5.2": {
+            "name": "GLM-5.2 (Z.AI)",
+            "limit": {
+              "context": 202752,
+              "output": 16384
+            }
+          },
+          "glm-4.7": {
+            "name": "GLM-4.7 (Z.AI)",
+            "limit": {
+              "context": 128000,
+              "output": 4096
+            }
+          },
+          "glm-4.5-air": {
+            "name": "GLM-4.5 Air (Z.AI)",
+            "limit": {
+              "context": 128000,
+              "output": 4096
+            }
+          }
+        }
+      }
+    }
+  },
+  "omo": {
+    "default_model": "headroom/glm-4.7",
+    "agents": {
+      "oracle": "headroom/glm-5.2",
+      "prometheus": "headroom/glm-5.2",
+      "metis": "headroom/glm-5.2"
+    },
+    "categories": {
+      "ultrabrain": "headroom/glm-5.2",
+      "quick": "headroom/glm-4.5-air",
+      "unspecified-low": "headroom/glm-4.5-air"
+    }
+  },
+  "prelaunch": [
+    {
+      "name": "Headroom Proxy (Z.AI)",
+      "check": { "tcp": 8989 },
+      "start": "headroom proxy --port 8989 --openai-api-url https://api.z.ai/api/coding/paas/v4",
+      "timeoutMs": 30000
+    }
+  ],
+  "env": {}
+}

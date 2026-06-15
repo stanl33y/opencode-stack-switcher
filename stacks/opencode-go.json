@@ -1,0 +1,45 @@
+{
+  "name": "opencode-go",
+  "description": "OpenCode Go plan (Zen) — modelos pagos, sem config extra",
+  "opencode": {
+    "model": "opencode-go/qwen3.7-max",
+    "small_model": "opencode-go/deepseek-v4-flash",
+    "agent": {
+      "build": { "model": "opencode-go/deepseek-v4-pro" },
+      "plan": { "model": "opencode-go/qwen3.7-max" }
+    },
+    "provider": {
+      "opencode-go": {
+        "name": "OpenCode Go (Zen)"
+      }
+    }
+  },
+  "omo": {
+    "default_model": "opencode-go/qwen3.7-max",
+    "agents": {
+      "oracle": "opencode-go/qwen3.7-max",
+      "prometheus": "opencode-go/deepseek-v4-pro",
+      "metis": "opencode-go/kimi-k2.6",
+      "hephaestus": "opencode-go/deepseek-v4-pro",
+      "sisyphus": "opencode-go/qwen3.7-max",
+      "llama": "opencode-go/deepseek-v4-flash",
+      "librarian": "opencode-go/deepseek-v4-flash",
+      "explore": "opencode-go/deepseek-v4-flash",
+      "multimodal-looker": "opencode-go/minimax-m3",
+      "momus": "opencode-go/mimo-v2.5",
+      "atlas": "opencode-go/qwen3.7-plus",
+      "sisyphus-junior": "opencode-go/mimo-v2.5"
+    },
+    "categories": {
+      "ultrabrain": "opencode-go/qwen3.7-max",
+      "visual-engineering": "opencode-go/deepseek-v4-pro",
+      "artistry": "opencode-go/kimi-k2.6",
+      "quick": "opencode-go/deepseek-v4-flash",
+      "unspecified-low": "opencode-go/mimo-v2.5",
+      "unspecified-high": "opencode-go/qwen3.7-plus",
+      "writing": "opencode-go/glm-5.1"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}

@@ -18,3 +18,12 @@ Thumbs.db
 # Build artifacts
 dist/
 build/
+
+# OpenCode directories
+.opencode/
+.serena/
+.sisyphus/
+.claude/
+
+# TypeScript build info
+*.tsbuildinfo

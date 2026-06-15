@@ -1,0 +1,76 @@
+{
+  "name": "commandcode",
+  "description": "CommandCode — modelos com deals ativos (75% off DeepSeek, 98-99% off MiMo, 57% Nemotron, 50% Qwen/MiniMax)",
+  "opencode": {
+    "model": "commandcode/deepseek/deepseek-v4-pro",
+    "small_model": "commandcode/xiaomi/mimo-v2.5",
+    "agent": {
+      "build": { "model": "commandcode/deepseek/deepseek-v4-pro" },
+      "plan": { "model": "commandcode/Qwen/Qwen3.7-Max" }
+    },
+    "provider": {
+      "commandcode": {
+        "name": "CommandCode",
+        "npm": "@ai-sdk/openai-compatible",
+        "options": {
+          "baseURL": "https://api.commandcode.ai/provider/v1",
+          "apiKey": "${COMMANDCODEAI_API_KEY}"
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "name": "DeepSeek V4 Pro (75% off · 4×)",
+            "limit": { "context": 1000000, "output": 16384 }
+          },
+          "nvidia/nemotron-3-ultra-550b-a55b": {
+            "name": "Nemotron 3 Ultra (57% off · 2.3×)",
+            "limit": { "context": 1000000, "output": 16384 }
+          },
+          "Qwen/Qwen3.7-Max": {
+            "name": "Qwen 3.7 Max (50% off · 2× · exp 2026-06-22)",
+            "limit": { "context": 1000000, "output": 16384 }
+          },
+          "MiniMaxAI/MiniMax-M3": {
+            "name": "MiniMax M3 (50% off · 2× · ≤512K ctx)",
+            "limit": { "context": 1000000, "output": 32768 }
+          },
+          "xiaomi/mimo-v2.5-pro": {
+            "name": "MiMo V2.5 Pro (99% off cache · 7× output)",
+            "limit": { "context": 1000000, "output": 8192 }
+          },
+          "xiaomi/mimo-v2.5": {
+            "name": "MiMo V2.5 (98% off cache · 14× output)",
+            "limit": { "context": 1000000, "output": 8192 }
+          }
+        }
+      }
+    }
+  },
+  "omo": {
+    "default_model": "commandcode/deepseek/deepseek-v4-pro",
+    "agents": {
+      "oracle": "commandcode/Qwen/Qwen3.7-Max",
+      "prometheus": "commandcode/deepseek/deepseek-v4-pro",
+      "metis": "commandcode/nvidia/nemotron-3-ultra-550b-a55b",
+      "hephaestus": "commandcode/deepseek/deepseek-v4-pro",
+      "sisyphus": "commandcode/Qwen/Qwen3.7-Max",
+      "llama": "commandcode/xiaomi/mimo-v2.5",
+      "librarian": "commandcode/xiaomi/mimo-v2.5",
+      "explore": "commandcode/xiaomi/mimo-v2.5",
+      "multimodal-looker": "commandcode/MiniMaxAI/MiniMax-M3",
+      "momus": "commandcode/xiaomi/mimo-v2.5-pro",
+      "atlas": "commandcode/nvidia/nemotron-3-ultra-550b-a55b",
+      "sisyphus-junior": "commandcode/xiaomi/mimo-v2.5"
+    },
+    "categories": {
+      "ultrabrain": "commandcode/Qwen/Qwen3.7-Max",
+      "visual-engineering": "commandcode/deepseek/deepseek-v4-pro",
+      "artistry": "commandcode/nvidia/nemotron-3-ultra-550b-a55b",
+      "quick": "commandcode/xiaomi/mimo-v2.5",
+      "unspecified-low": "commandcode/xiaomi/mimo-v2.5",
+      "unspecified-high": "commandcode/Qwen/Qwen3.7-Max",
+      "writing": "commandcode/xiaomi/mimo-v2.5-pro"
+    }
+  },
+  "prelaunch": [],
+  "env": {}
+}
