@@ -1,0 +1,48 @@
+{
+  "_comment": "v0.1.0 era stack fixture for migration testing. No secrets included.",
+  "name": "v0.1.0-stack",
+  "description": "v0.1.0-era stack fixture for testing migration compatibility. Uses placeholder API keys.",
+  "opencode": {
+    "model": "openai:gpt-4o",
+    "small_model": "openai:gpt-4o-mini",
+    "agent": "openai:gpt-4o"
+  },
+  "omo": {
+    "default_model": "openai:gpt-4o-mini",
+    "agents": {
+      "oracle": "openai:gpt-4o",
+      "sisyphus": "openai:gpt-4o",
+      "hephaestus": "openai:gpt-4o",
+      "librarian": "openai:gpt-4o",
+      "explore": "openai:gpt-4o-mini",
+      "prometheus": "openai:gpt-4o",
+      "metis": "openai:gpt-4o",
+      "momus": "openai:gpt-4o",
+      "multimodal-looker": "openai:gpt-4o",
+      "atlas": "openai:gpt-4o-mini"
+    },
+    "categories": {
+      "visual-engineering": "openai:gpt-4o",
+      "ultrabrain": "openai:gpt-4o",
+      "artistry": "openai:gpt-4o",
+      "quick": "openai:gpt-4o-mini",
+      "unspecified-low": "openai:gpt-4o-mini",
+      "unspecified-high": "openai:gpt-4o",
+      "writing": "openai:gpt-4o"
+    }
+  },
+  "provider": {
+    "openai": {
+      "name": "OpenAI",
+      "apiKey": "$OPENAI_API_KEY"
+    },
+    "openrouter": {
+      "name": "OpenRouter",
+      "apiKey": "$OPENROUTER_API_KEY"
+    },
+    "zai": {
+      "name": "Z.AI",
+      "apiKey": "$ZAI_API_KEY"
+    }
+  }
+}
