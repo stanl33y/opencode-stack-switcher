@@ -10,6 +10,7 @@ resolved/
 # Sensitive patterns
 stacks/*-secret*.json
 stacks/*-private*.json
+stacks/headroom-opencode-go.json
 
 # OS files
 .DS_Store
