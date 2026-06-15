@@ -136,3 +136,7 @@ bun run src/cli.ts doctor > tests/golden/doctor.txt
 ```
 
 **Important**: Golden files capture ACTUAL behavior, including quirks and platform-specific formatting. Do NOT edit golden files manually - regenerate them from actual CLI output.
+
+### Changelog
+
+- **T3.5 (PT→EN standardization)**: All golden files regenerated to reflect English translations of CLI output. `doctor.txt` updated manually (health-check timeouts make live regeneration impractical). Stack descriptions in `list.txt` remain in original language (user data in manifests, not CLI code).

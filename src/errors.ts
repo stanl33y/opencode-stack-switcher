@@ -49,7 +49,7 @@ export class StackNotFoundError extends OcsError {
     super(
       "STACK_NOT_FOUND",
       1,
-      `Stack '${stackName}' não existe (${path}). Use 'ocs list'.`,
+      `Stack '${stackName}' does not exist (${path}). Use 'ocs list'.`,
       "run: ocs list",
     );
     this.name = "StackNotFoundError";
@@ -74,7 +74,7 @@ export class BaseConfigMissingError extends OcsError {
     super(
       "BASE_CONFIG_MISSING",
       3,
-      "stacks/base.json ausente — rode 'ocs init' para gerá-lo do config atual.",
+      "stacks/base.json missing — run 'ocs init' to generate it from the current config.",
       "run: ocs init",
     );
     this.name = "BaseConfigMissingError";

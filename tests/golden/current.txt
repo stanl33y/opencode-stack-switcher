@@ -1,1 +1,1 @@
-Stack ativa: zai
+Active stack: headroom-opencode-go

@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { API_KEY_NAMES, getDefaultEditor, isApiKeySet } from "./config.ts";
 import { parseJsonc } from "./jsonc.ts";
-import { launchOpencode } from "./launch.ts";
+import { DefaultSpawner, launchOpencode } from "./launch.ts";
 import { currentStack, pickStack } from "./menu.ts";
 import { OPENCODE_CONFIG_DIR, STACKS_DIR } from "./paths.ts";
 import { runPrelaunch } from "./prelaunch.ts";
@@ -19,18 +19,18 @@ function splitArgs(argv: string[]): { args: string[]; passthrough: string[] } {
 
 async function cmdUse(name: string, passthrough: string[]) {
   const manifest = loadStack(name);
-  console.log(`Resolvendo stack '${name}'…`);
+  console.log(`Resolving stack '${name}'…`);
   const { dir } = resolveStack(manifest);
 
   if (manifest.prelaunch?.length) {
-    console.log("Prelaunch (servidores locais):");
+    console.log("Prelaunch (local servers):");
     const down = await runPrelaunch(manifest.prelaunch);
     if (down.length) {
-      console.log(`\n⚠ Indisponíveis: ${down.join(", ")}. Lançando opencode mesmo assim.`);
+      console.log(`\n⚠ Unavailable: ${down.join(", ")}. Launching opencode anyway.`);
     }
   }
 
-  const code = await launchOpencode(manifest, dir, passthrough);
+  const code = await launchOpencode(manifest, dir, passthrough, new DefaultSpawner());
   process.exit(code);
 }
 
@@ -38,7 +38,7 @@ function cmdList() {
   const names = listStackNames();
   const cur = currentStack();
   if (!names.length) {
-    console.log("Nenhuma stack em stacks/.");
+    console.log("No stacks found in stacks/.");
     return;
   }
   console.log("Stacks:");
@@ -47,9 +47,9 @@ function cmdList() {
     try {
       desc = loadStack(name).description ?? "";
     } catch {
-      desc = "(manifest inválido)";
+      desc = "(invalid manifest)";
     }
-    const mark = name === cur ? " ◀ atual" : "";
+    const mark = name === cur ? " ◀ current" : "";
     console.log(`  ${name.padEnd(18)} ${desc}${mark}`);
   }
 }
@@ -72,19 +72,19 @@ function cmdShow(name: string) {
 
 function cmdCurrent() {
   const cur = currentStack();
-  console.log(cur ? `Stack ativa: ${cur}` : "Nenhuma stack ativada ainda.");
+  console.log(cur ? `Active stack: ${cur}` : "No active stack yet.");
 }
 
 async function cmdDoctor() {
-  console.log(`Config dir global: ${OPENCODE_CONFIG_DIR}`);
+  console.log(`Global config dir: ${OPENCODE_CONFIG_DIR}`);
   console.log(
-    `base.json: ${existsSync(join(STACKS_DIR, "base.json")) ? "ok" : "AUSENTE — rode 'ocs init'"}`,
+    `base.json: ${existsSync(join(STACKS_DIR, "base.json")) ? "ok" : "MISSING — run 'ocs init'"}`,
   );
-  console.log("\nVariáveis de ambiente de provider:");
+  console.log("\nProvider environment variables:");
   for (const k of API_KEY_NAMES) {
-    console.log(`  ${k}: ${isApiKeySet(k) ? "definida" : "—"}`);
+    console.log(`  ${k}: ${isApiKeySet(k) ? "set" : "—"}`);
   }
-  console.log("\nPrelaunch por stack (health-check):");
+  console.log("\nPrelaunch per stack (health-check):");
   for (const name of listStackNames()) {
     const m = loadStack(name);
     if (!m.prelaunch?.length) continue;
@@ -96,7 +96,7 @@ async function cmdDoctor() {
 function cmdEdit(name: string) {
   const path = join(STACKS_DIR, `${name}.json`);
   if (!existsSync(path)) {
-    console.error(`Stack '${name}' não existe (${path}).`);
+    console.error(`Stack '${name}' does not exist (${path}).`);
     process.exit(1);
   }
   const editor = getDefaultEditor();
@@ -104,11 +104,11 @@ function cmdEdit(name: string) {
   child.on("exit", (code) => process.exit(code ?? 0));
 }
 
-/** Gera stacks/base.json a partir do opencode.json global, removendo overlays variáveis. */
+/** Generates stacks/base.json from global opencode.json, removing variable overlays. */
 function cmdInit() {
   const src = join(OPENCODE_CONFIG_DIR, "opencode.json");
   if (!existsSync(src)) {
-    console.error(`Não achei ${src} para gerar base.json.`);
+    console.error(`Could not find ${src} to generate base.json.`);
     process.exit(1);
   }
   const cfg = parseJsonc<Record<string, unknown>>(readFileSync(src, "utf8"));
@@ -117,21 +117,21 @@ function cmdInit() {
   const out = join(STACKS_DIR, "base.json");
   writeFileSync(out, JSON.stringify(cfg, null, 2) + "\n");
   console.log(
-    `base.json gerado: ${out}\n(providers/mcp/tools/plugin preservados; model/small_model removidos)`,
+    `base.json generated: ${out}\n(providers/mcp/tools/plugins preserved; model/small_model removed)`,
   );
 }
 
 function usage() {
   console.log(`ocs — OpenCode Stack Switcher
 
-  ocs                      menu interativo
-  ocs use <stack> [-- ...] resolve, prelaunch e lança opencode (args após -- vão p/ opencode)
-  ocs list                 lista stacks
-  ocs show <stack>         mostra config resolvido
-  ocs current              stack ativa
-  ocs doctor               checa base/keys/portas
-  ocs edit <stack>         abre manifest no \$EDITOR
-  ocs init                 (re)gera stacks/base.json do config global
+  ocs                      interactive menu
+  ocs use <stack> [-- ...] resolve, prelaunch and launch opencode (args after -- go to opencode)
+  ocs list                 list stacks
+  ocs show <stack>         show resolved config
+  ocs current              active stack
+  ocs doctor               check base/keys/ports
+  ocs edit <stack>         open manifest in \$EDITOR
+  ocs init                 (re)generate stacks/base.json from global config
 `);
 }
 
@@ -141,13 +141,13 @@ async function main() {
 
   switch (cmd) {
     case undefined: {
-      const picked = await pickStack();
+      const picked = await pickStack(listStackNames());
       if (picked) await cmdUse(picked, passthrough);
       break;
     }
     case "use":
       if (!arg) {
-        console.error("uso: ocs use <stack>");
+        console.error("usage: ocs use <stack>");
         process.exit(1);
       }
       await cmdUse(arg, passthrough);
@@ -157,7 +157,7 @@ async function main() {
       break;
     case "show":
       if (!arg) {
-        console.error("uso: ocs show <stack>");
+        console.error("usage: ocs show <stack>");
         process.exit(1);
       }
       cmdShow(arg);
@@ -170,7 +170,7 @@ async function main() {
       break;
     case "edit":
       if (!arg) {
-        console.error("uso: ocs edit <stack>");
+        console.error("usage: ocs edit <stack>");
         process.exit(1);
       }
       cmdEdit(arg);
@@ -184,12 +184,12 @@ async function main() {
       usage();
       break;
     default:
-      // atalho: `ocs <stack>` == `ocs use <stack>`
+      // shortcut: `ocs <stack>` == `ocs use <stack>`
       if (listStackNames().includes(cmd)) {
         await cmdUse(cmd, passthrough);
         break;
       }
-      console.error(`comando desconhecido: ${cmd}`);
+      console.error(`unknown command: ${cmd}`);
       usage();
       process.exit(1);
   }

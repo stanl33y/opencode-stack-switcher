@@ -14,10 +14,10 @@ export function resolveEnvVars<T>(value: T): T {
     if (match) {
       const envVal = getEnv(match[1]);
       if (envVal !== undefined) return envVal as T;
-      // fallback: mantém o marcador se a var não existir
-      // mas tenta resolver $VAR embutido em string maior também
+      // fallback: keep the marker if the var doesn't exist
+      // but also try to resolve $VAR embedded in a larger string
     }
-    // resolve $VAR ou ${VAR} dentro de strings maiores (ex: "Bearer $TOKEN")
+    // resolve $VAR or ${VAR} inside larger strings (e.g. "Bearer $TOKEN")
     return value.replace(/\$\{?(\w+)\}?/g, (_, name) => getEnv(name) ?? `\${${name}}`) as T;
   }
   if (Array.isArray(value)) {
@@ -33,7 +33,7 @@ export function resolveEnvVars<T>(value: T): T {
   return value;
 }
 
-// Conjunto fixo de agents/categories do oh-my-openagent (extraído do schema/config atual).
+// Fixed set of oh-my-openagent agents/categories (extracted from current schema/config).
 export const OMO_AGENTS = [
   "llama",
   "sisyphus",
@@ -63,7 +63,7 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-/** Deep-merge: `override` vence; objetos mesclam, arrays/escalares substituem. */
+/** Deep-merge: `override` wins; objects merge, arrays/scalars replace. */
 export function deepMerge<T extends Record<string, unknown>>(
   base: T,
   override: Record<string, unknown>,
@@ -80,7 +80,7 @@ export function deepMerge<T extends Record<string, unknown>>(
   return out as T;
 }
 
-/** Monta o oh-my-opencode.json a partir do default_model + overrides. */
+/** Builds oh-my-opencode.json from default_model + overrides. */
 export function buildOmoConfig(manifest: StackManifest): Record<string, unknown> {
   const omo = manifest.omo ?? {};
   const def = omo.default_model;
@@ -111,7 +111,7 @@ export interface ResolveResult {
   omo: Record<string, unknown>;
 }
 
-/** Resolve a stack: escreve resolved/<name>/{opencode.json,oh-my-opencode.json,package.json}. */
+/** Resolves a stack: writes resolved/<name>/{opencode.json,oh-my-opencode.json,package.json}. */
 export function resolveStack(manifest: StackManifest): ResolveResult {
   const base = loadBase();
   const opencode = manifest.opencode ? deepMerge(base, manifest.opencode) : base;
@@ -119,12 +119,12 @@ export function resolveStack(manifest: StackManifest): ResolveResult {
 
   const dir = resolvedStackDir(manifest.name);
   mkdirSync(dir, { recursive: true });
-  // resolve $VAR antes de escrever o config — senão o OpenCode pode não resolver
+  // resolve $VAR before writing config — otherwise OpenCode may not resolve
   const opencodeResolved = resolveEnvVars(opencode);
   writeFileSync(join(dir, "opencode.json"), `${JSON.stringify(opencodeResolved, null, 2)}\n`);
   writeFileSync(join(dir, "oh-my-opencode.json"), `${JSON.stringify(omo, null, 2)}\n`);
 
-  // package.json com a dep do plugin — necessário p/ o plugin resolver neste dir.
+  // package.json with plugin dep — required for the plugin to resolve in this dir.
   const globalPkg = join(OPENCODE_CONFIG_DIR, "package.json");
   const pkgContent = existsSync(globalPkg)
     ? readFileSync(globalPkg, "utf8")

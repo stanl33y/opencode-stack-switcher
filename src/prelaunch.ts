@@ -22,7 +22,7 @@ async function checkUrl(url: string, timeoutMs = 2000): Promise<boolean> {
     const t = setTimeout(() => ctrl.abort(), timeoutMs);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(t);
-    return res.ok || res.status === 401 || res.status === 404; // servidor respondeu = vivo
+    return res.ok || res.status === 401 || res.status === 404; // server responded = alive
   } catch {
     return false;
   }
@@ -37,9 +37,9 @@ async function isHealthy(entry: PrelaunchEntry): Promise<boolean> {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * Para cada servidor: se vivo, segue. Se morto e tem `start`, sobe e espera ficar saudável.
- * Se morto e sem `start`, retorna o nome p/ o caller avisar.
- * Retorna lista de servidores indisponíveis (que não subiram).
+ * For each server: if alive, continue. If down and has `start`, start it and wait for healthy.
+ * If down and no `start`, return the name for the caller to report.
+ * Returns list of unavailable servers (that did not come up).
  */
 export async function runPrelaunch(entries: PrelaunchEntry[]): Promise<string[]> {
   const unavailable: string[] = [];
@@ -47,17 +47,17 @@ export async function runPrelaunch(entries: PrelaunchEntry[]): Promise<string[]>
   for (const entry of entries) {
     process.stdout.write(`  • ${entry.name}: `);
     if (await isHealthy(entry)) {
-      console.log("ok (já no ar)");
+      console.log("ok (already running)");
       continue;
     }
 
     if (!entry.start) {
-      console.log("DOWN — sem comando 'start' configurado");
+      console.log("DOWN — no 'start' command configured");
       unavailable.push(entry.name);
       continue;
     }
 
-    console.log("subindo…");
+    console.log("starting…");
     const child = spawn(entry.start, {
       shell: true,
       cwd: entry.cwd,
@@ -77,9 +77,9 @@ export async function runPrelaunch(entries: PrelaunchEntry[]): Promise<string[]>
       }
     }
     if (up) {
-      console.log(`    ${entry.name}: pronto`);
+      console.log(`    ${entry.name}: ready`);
     } else {
-      console.log(`    ${entry.name}: TIMEOUT após ${Math.round(timeout / 1000)}s`);
+      console.log(`    ${entry.name}: TIMEOUT after ${Math.round(timeout / 1000)}s`);
       unavailable.push(entry.name);
     }
   }

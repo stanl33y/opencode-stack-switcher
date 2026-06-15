@@ -1,20 +1,20 @@
-Config dir global: C:\Users\stanl\.config\opencode
+Global config dir: C:\Users\stanl\.config\opencode
 base.json: ok
 
-Vari├íveis de ambiente de provider:
-  ZAI_API_KEY: definida
-  OPENAI_API_KEY: ÔÇö
-  OPENROUTER_API_KEY: definida
+Provider environment variables:
+  ZAI_API_KEY: set
+  OPENAI_API_KEY: —
+  OPENROUTER_API_KEY: set
 
-Prelaunch por stack (health-check):
+Prelaunch per stack (health-check):
   [headroom-opencode-go]
-  ÔÇó Headroom Proxy (Zen Go): subindoÔÇª
-    Headroom Proxy (Zen Go): TIMEOUT ap├│s 30s
+  • Headroom Proxy (Zen Go): starting…
+    Headroom Proxy (Zen Go): TIMEOUT after 30s
   [headroom-openrouter]
-  ÔÇó Headroom Proxy: ok (j├í no ar)
+  • Headroom Proxy: ok (already running)
   [headroom-zai]
-  ÔÇó Headroom Proxy (Z.AI): ok (j├í no ar)
+  • Headroom Proxy (Z.AI): ok (already running)
   [offline]
-  ÔÇó llama-rtx: DOWN ÔÇö sem comando 'start' configurado
-  ÔÇó llama-igpu: DOWN ÔÇö sem comando 'start' configurado
-  ÔÇó ollama: ok (j├í no ar)
+  • llama-rtx: DOWN — no 'start' command configured
+  • llama-igpu: DOWN — no 'start' command configured
+  • ollama: ok (already running)
