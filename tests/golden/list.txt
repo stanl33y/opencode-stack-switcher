@@ -1,0 +1,12 @@
+Stacks:
+  commandcode        CommandCode ÔÇö modelos com deals ativos (75% off DeepSeek, 98-99% off MiMo, 57% Nemotron, 50% Qwen/MiniMax)
+  example            Example stack using OpenAI GPT-4o as default. Configure your API keys via environment variables.
+  headroom-opencode-go Headroom proxy ÔåÆ OpenCode Go (Zen), modelos pagos com otimiza├º├úo de contexto
+  headroom-openrouter Headroom proxy (localhost:8787) ÔåÆ OpenRouter free models
+  headroom-zai       Z.AI Coding Plan (GLM) via headroom proxy (localhost:8788)
+  offline            Local/offline ÔÇö llama.cpp RTX+iGPU, sem internet
+  openai             Somente modelos OpenAI (GPT-5.5)
+  opencode-go        OpenCode Go plan (Zen) ÔÇö modelos pagos, sem config extra
+  openrouter-eff     OpenRouter ÔÇö melhor custo/benef├¡cio (DeepSeek/Qwen/Gemini)
+  openrouter-free    Modelos free (custo zero)
+  zai                Tudo no zai-coding-plan (GLM) ÔùÇ atual

@@ -100,3 +100,39 @@ The coverage threshold is enforced in `scripts/check-coverage.ts`:
 - Script exits with non-zero code if any file doesn't meet thresholds
 
 This ensures that all new code is properly tested before merging.
+
+## Golden Files (Characterization Tests)
+
+### Purpose
+Golden files capture the actual CLI output for specific commands using a known fixture stack. These are characterization tests that document the current behavior of the CLI before refactoring.
+
+### Location
+- Golden files are located in the `tests/golden/` directory
+- Fixture stacks are located in `tests/fixtures/` directory
+
+### Golden Files
+The following golden files capture CLI output:
+
+- `list.txt` - Output of `ocs list` command
+- `show-test-stack.txt` - Output of `ocs show test-stack` command
+- `current.txt` - Output of `ocs current` command
+- `doctor.txt` - Output of `ocs doctor` command
+
+### Usage Pattern
+Golden files are used to:
+1. **Document current behavior** - Before refactoring, capture the exact output
+2. **Detect regressions** - After changes, compare output against golden files
+3. **Platform-specific differences** - Golden files may vary slightly across platforms (Windows vs Unix)
+
+### Regenerating Golden Files
+If CLI behavior changes intentionally, regenerate golden files:
+
+```bash
+# Ensure test-stack.json exists in stacks/
+bun run src/cli.ts list > tests/golden/list.txt
+bun run src/cli.ts show test-stack > tests/golden/show-test-stack.txt
+bun run src/cli.ts current > tests/golden/current.txt
+bun run src/cli.ts doctor > tests/golden/doctor.txt
+```
+
+**Important**: Golden files capture ACTUAL behavior, including quirks and platform-specific formatting. Do NOT edit golden files manually - regenerate them from actual CLI output.

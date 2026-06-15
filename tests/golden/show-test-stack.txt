@@ -1,0 +1,140 @@
+# resolved/test-stack  (C:\Users\stanl\opencode-stan\resolved\test-stack)
+
+## opencode.json (model/small_model/agent)
+{
+  "model": "openai:gpt-4o",
+  "small_model": "openai:gpt-4o-mini",
+  "agent": {
+    "build": {
+      "mode": "primary"
+    },
+    "plan": {
+      "mode": "primary"
+    },
+    "llama-rtx": {
+      "description": "Local RTX agent ÔÇö long context, file editing, no internet (131K ctx, MTP)",
+      "model": "llama-rtx/qwen3.5-4b",
+      "mode": "all",
+      "prompt": "/no_think You are a local file editing agent. You ONLY use read, write, edit, and glob tools. Never use web search, fetch, or any external tools. When given a task, find the relevant files, read them, make the requested changes, done. Be direct and efficient.",
+      "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
+        "google_search": "deny",
+        "ast_grep_search": "deny",
+        "lsp_diagnostics": "deny",
+        "background_output": "deny",
+        "task": "deny",
+        "skill": "deny",
+        "ui_to_artifact": "deny",
+        "extract_text_from_screenshot": "deny",
+        "diagnose_error_screenshot": "deny",
+        "understand_technical_diagram": "deny",
+        "analyze_data_visualization": "deny",
+        "ui_diff_check": "deny",
+        "image_analysis": "deny",
+        "video_analysis": "deny",
+        "context7": "deny",
+        "grep_app": "deny",
+        "lsp": "deny",
+        "ast_grep": "deny"
+      }
+    },
+    "llama-igpu": {
+      "description": "Local iGPU agent ÔÇö fast generation, short tasks, no internet (32K ctx)",
+      "model": "llama-igpu/qwen3.5-4b",
+      "mode": "all",
+      "prompt": "/no_think You are a local file editing agent. You ONLY use read, write, edit, and glob tools. Never use web search, fetch, or any external tools. When given a task, find the relevant files, read them, make the requested changes, done. Be direct and efficient.",
+      "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
+        "google_search": "deny",
+        "ast_grep_search": "deny",
+        "lsp_diagnostics": "deny",
+        "background_output": "deny",
+        "task": "deny",
+        "skill": "deny",
+        "ui_to_artifact": "deny",
+        "extract_text_from_screenshot": "deny",
+        "diagnose_error_screenshot": "deny",
+        "understand_technical_diagram": "deny",
+        "analyze_data_visualization": "deny",
+        "ui_diff_check": "deny",
+        "image_analysis": "deny",
+        "video_analysis": "deny",
+        "context7": "deny",
+        "grep_app": "deny",
+        "lsp": "deny",
+        "ast_grep": "deny"
+      }
+    }
+  }
+}
+
+## oh-my-opencode.json
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+  "sisyphus_agent": {
+    "replace_plan": false
+  },
+  "agents": {
+    "llama": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "sisyphus": {
+      "model": "openai:gpt-4o"
+    },
+    "hephaestus": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "oracle": {
+      "model": "openai:gpt-4o"
+    },
+    "librarian": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "explore": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "multimodal-looker": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "prometheus": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "metis": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "momus": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "atlas": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "sisyphus-junior": {
+      "model": "openai:gpt-4o-mini"
+    }
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "ultrabrain": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "artistry": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "quick": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "unspecified-low": {
+      "model": "openai:gpt-4o-mini"
+    },
+    "unspecified-high": {
+      "model": "openai:gpt-4o"
+    },
+    "writing": {
+      "model": "openai:gpt-4o-mini"
+    }
+  }
+}
