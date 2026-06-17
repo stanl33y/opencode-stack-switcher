@@ -1,0 +1,46 @@
+# Tests
+tests/
+*.test.ts
+coverage/
+
+# Documentation (migration guide, ADRs)
+docs/
+
+# GitHub config
+.github/
+
+# Git hooks
+.husky/
+
+# Plan files
+.sisyphus/
+
+# OpenCode config
+.opencode/
+
+# Serena config
+.serena/
+
+# Claude config
+.claude/
+
+# Dev scripts
+scripts/
+
+# Environment files
+.env
+.env.local
+.env.example
+
+# Node modules (redundant but explicit)
+node_modules/
+
+# Local stacks (private config)
+stacks/*.local.json
+
+# Dist (not pre-built)
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db

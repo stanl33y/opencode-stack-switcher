@@ -1,8 +1,20 @@
 {
   "name": "ocs",
-  "version": "0.1.0",
-  "description": "OpenCode Stack Switcher — troca stacks de modelos (agents/subagents/categories) e lança o opencode",
+  "version": "0.2.0",
+  "description": "OpenCode Stack Switcher — switch model stacks (agents/subagents/categories) and launch opencode",
   "type": "module",
+  "files": ["src", "stacks/example.json", "README.md", "LICENSE", "CHANGELOG.md"],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/cli.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "sideEffects": false,
   "bin": {
     "ocs": "./src/cli.ts"
   },

@@ -6,6 +6,7 @@ resolved/
 
 # Private stacks (user-specific with secrets)
 *.local.json
+stacks/base.json
 
 # Sensitive patterns
 stacks/*-secret*.json

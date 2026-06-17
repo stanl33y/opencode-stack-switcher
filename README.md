@@ -67,62 +67,86 @@ Before installing OCS, make sure you have:
 ### Install OCS
 
 ```bash
-# Clone the repository
+# Option A: npm (recommended for end users)
+npm install -g ocs
+
+# Option B: bun
+bun add -g ocs
+
+# Option C: git (for development)
 git clone https://github.com/stanl33y/opencode-stack-switcher.git
 cd opencode-stack-switcher
-
-# Install dependencies
 bun install
-
-# Link globally (optional)
 bun link
 ```
 
 ## 🛠️ Development Setup
 
-### Environment Variables
+### Prerequisites
 
-Create a `.env` file based on `.env.example`:
+- [Bun](https://bun.sh/) >= 1.0
+- [OpenCode CLI](https://github.com/opencode-ai/opencode)
+- [Oh My OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) plugin
+
+### Quick Start
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/stanl33y/opencode-stack-switcher.git
+cd opencode-stack-switcher
+```
+
+2. Install dependencies:
+
+```bash
+bun install
+```
+
+3. Set up environment variables:
 
 ```bash
 cp .env.example .env
+# Edit .env with your API keys
 ```
 
-Edit `.env` with your API keys and preferences:
+The `.env` file supports these variables:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | One of | OpenAI API key |
+| `OPENROUTER_API_KEY` | these | OpenRouter API key |
+| `ZAI_API_KEY` | | ZAI API key |
+| `EDITOR` | No | Editor for `ocs edit` (defaults to `$EDITOR`, then `vi`) |
+| `OPENCODE_CONFIG_DIR` | No | Override OpenCode config dir (defaults to `~/.config/opencode`) |
+
+4. Verify installation:
 
 ```bash
-# API Keys (set at least one based on your stacks)
-OPENAI_API_KEY=sk-your-openai-key
-OPENROUTER_API_KEY=sk-or-your-openrouter-key
-ZAI_API_KEY=zai-your-zai-key
-
-# Optional: Editor for `ocs edit` command (defaults to $EDITOR, then 'vi')
-EDITOR=code
-
-# Optional: OpenCode config dir override (defaults to ~/.config/opencode)
-# OPENCODE_CONFIG_DIR=/custom/path
-```
-
-### Cold Install Verification
-
-Test the installation process from scratch using the verification script:
-
-```bash
-# Run cold install verification (requires Git and Bun)
 chmod +x scripts/verify-cold-install.sh
 ./scripts/verify-cold-install.sh
 ```
 
-This script will:
-1. Clone the repository to a temporary directory
-2. Install dependencies with `bun install`
-3. Initialize OCS with `ocs init`
-4. Test basic functionality with `ocs list`
-5. Report success or failures
+The verification script clones to a temp directory, installs deps, runs `ocs init`, and tests `ocs list`. It confirms the project works from a cold start with no prior configuration.
+
+5. Run the development server:
+
+```bash
+bun run dev
+```
+
+### Testing
+
+```bash
+bun test              # Run all tests
+bun test --coverage   # With coverage report
+bun run typecheck     # TypeScript type checking
+bun run lint          # Biome lint and format
+```
 
 ### Development Tips
 
-- Always run `ocs doctor` to check system health
+- Run `ocs doctor` to check system health at any time
 - Use `ocs edit <stack>` to modify stack manifests with your preferred editor
 - The verification script ensures the project can be set up from scratch without any prior configuration
 
@@ -151,6 +175,12 @@ ocs doctor
 
 # Edit stack manifest
 ocs edit <stack>
+
+# Validate stack manifest (schema + security checks)
+ocs validate <stack>
+
+# Compare two stacks side by side
+ocs diff <stack-a> <stack-b>
 
 # Initialize base.json from global opencode config
 ocs init
@@ -227,10 +257,30 @@ ocs use my-stack
 
 ## 🔧 How It Works
 
-1. **Resolve**: Deep merge `stacks/base.json` with stack manifest
-2. **Generate configs**: Create `resolved/<stack>/opencode.json` and `oh-my-opencode.json`
-3. **Prelaunch**: Check/start local configured servers
-4. **Launch**: Execute `opencode` with `OPENCODE_CONFIG_DIR` pointing to the stack
+```mermaid
+graph TD
+    A["stacks/*.json"] -->|loadStack| B["Stack manifest"]
+    C["stacks/base.json"] -->|loadBase| D["Base config"]
+    B --> E["resolveStack"]
+    D --> E
+    E --> F{"deepMerge<br>base + stack"}
+    F -->|opencode overlay| G["resolveEnvVars<br>($VAR → value)"]
+    G --> H["buildOmoConfig<br>(agents + categories)"]
+    H --> I["Write resolved/ files<br>opencode.json + oh-my-opencode.json"]
+    I --> J["runPrelaunch<br>(health checks + start servers)"]
+    J --> K["launchOpencode<br>(spawn with OPENCODE_CONFIG_DIR)"]
+```
+
+When you run `ocs use <stack>`, the pipeline flows like this:
+
+1. **loadStack** reads `stacks/<stack>.json` and validates it with zod
+2. **loadBase** reads `stacks/base.json` (your default opencode config)
+3. **resolveStack** deep merges the base config with the stack's opencode overlay
+4. **resolveEnvVars** substitutes `$VAR` and `${VAR}` references with environment values
+5. **buildOmoConfig** generates the oh-my-opencode plugin config from agent/category model assignments
+6. **Write** outputs `resolved/<stack>/opencode.json` and `oh-my-opencode.json`
+7. **runPrelaunch** checks health of configured local servers, starts any that aren't running
+8. **launchOpencode** spawns opencode with `OPENCODE_CONFIG_DIR` pointing to the resolved stack directory
 
 ## 📝 Example Stack
 
@@ -238,7 +288,7 @@ See `stacks/example.json` for a safe reference configuration.
 
 ## 🐛 Troubleshooting
 
-### "stacks/base.json ausente"
+### "stacks/base.json missing"
 ```bash
 ocs init
 ```

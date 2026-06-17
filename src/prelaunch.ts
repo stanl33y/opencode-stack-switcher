@@ -1,8 +1,14 @@
 import { spawn } from "node:child_process";
 import { connect } from "node:net";
+import { HealthCheckTimeoutError } from "./errors.ts";
 import type { PrelaunchEntry } from "./stacks.ts";
 
-function checkTcp(port: number, host = "127.0.0.1", timeoutMs = 1000): Promise<boolean> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Internal single-attempt TCP check.
+ */
+function checkTcpOnce(port: number, host = "127.0.0.1", timeoutMs = 1000): Promise<boolean> {
   return new Promise((resolve) => {
     const sock = connect({ port, host });
     const done = (ok: boolean) => {
@@ -16,7 +22,44 @@ function checkTcp(port: number, host = "127.0.0.1", timeoutMs = 1000): Promise<b
   });
 }
 
-async function checkUrl(url: string, timeoutMs = 2000): Promise<boolean> {
+/**
+ * TCP health check with retry and exponential backoff.
+ *
+ * Attempts to connect to the specified port, retrying up to `maxRetries` times
+ * with exponential backoff between attempts.
+ *
+ * @param port - TCP port to check
+ * @param host - Host address (default "127.0.0.1")
+ * @param timeoutMs - Per-attempt connection timeout in ms (default 1000)
+ * @param maxRetries - Maximum number of connection attempts (default 3)
+ * @param baseDelay - Base delay in ms for exponential backoff (default 100)
+ * @returns true if the connection succeeds
+ * @throws {HealthCheckTimeoutError} When all retry attempts are exhausted
+ *
+ * @example
+ * ```typescript
+ * await checkTcp(3000); // Check localhost:3000 with defaults
+ * ```
+ */
+export async function checkTcp(
+  port: number,
+  host = "127.0.0.1",
+  timeoutMs = 1000,
+  maxRetries = 3,
+  baseDelay = 100,
+): Promise<boolean> {
+  for (let i = 0; i < maxRetries; i++) {
+    const ok = await checkTcpOnce(port, host, timeoutMs);
+    if (ok) return true;
+    if (i < maxRetries - 1) await sleep(baseDelay * 2 ** i);
+  }
+  throw new HealthCheckTimeoutError(`tcp:${port}`, port, timeoutMs * maxRetries);
+}
+
+/**
+ * Internal single-attempt URL check.
+ */
+async function checkUrlOnce(url: string, timeoutMs = 2000): Promise<boolean> {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -28,18 +71,56 @@ async function checkUrl(url: string, timeoutMs = 2000): Promise<boolean> {
   }
 }
 
-async function isHealthy(entry: PrelaunchEntry): Promise<boolean> {
-  if (entry.check.tcp != null) return checkTcp(entry.check.tcp);
-  if (entry.check.url) return checkUrl(entry.check.url);
-  return true;
+/**
+ * URL health check with retry and exponential backoff.
+ *
+ * Attempts an HTTP request to the specified URL, retrying up to `maxRetries` times
+ * with exponential backoff. HTTP 401 and 404 responses count as "alive".
+ *
+ * @param url - URL to check
+ * @param timeoutMs - Per-attempt request timeout in ms (default 2000)
+ * @param maxRetries - Maximum number of request attempts (default 3)
+ * @param baseDelay - Base delay in ms for exponential backoff (default 100)
+ * @returns true if the URL responds (2xx, 401, or 404)
+ * @throws {HealthCheckTimeoutError} When all retry attempts are exhausted
+ *
+ * @example
+ * ```typescript
+ * await checkUrl("http://localhost:3000/health");
+ * ```
+ */
+export async function checkUrl(
+  url: string,
+  timeoutMs = 2000,
+  maxRetries = 3,
+  baseDelay = 100,
+): Promise<boolean> {
+  for (let i = 0; i < maxRetries; i++) {
+    const ok = await checkUrlOnce(url, timeoutMs);
+    if (ok) return true;
+    if (i < maxRetries - 1) await sleep(baseDelay * 2 ** i);
+  }
+  throw new HealthCheckTimeoutError(url, 0, timeoutMs * maxRetries);
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+async function isHealthy(entry: PrelaunchEntry): Promise<boolean> {
+  try {
+    if (entry.check.tcp != null) return await checkTcp(entry.check.tcp);
+    if (entry.check.url) return await checkUrl(entry.check.url);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
- * For each server: if alive, continue. If down and has `start`, start it and wait for healthy.
- * If down and no `start`, return the name for the caller to report.
- * Returns list of unavailable servers (that did not come up).
+ * Runs prelaunch checks and starts for a list of server entries.
+ *
+ * For each entry: if already healthy, continues. If down and has a `start` command,
+ * starts it and waits for healthy. If down and no `start`, marks as unavailable.
+ *
+ * @param entries - Array of prelaunch entries to check/start
+ * @returns Array of server names that were unavailable (did not come up)
  */
 export async function runPrelaunch(entries: PrelaunchEntry[]): Promise<string[]> {
   const unavailable: string[] = [];

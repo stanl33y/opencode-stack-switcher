@@ -40,6 +40,8 @@ class MockSpawner implements ProcessSpawner {
 
 let mkdirSyncSpy: ReturnType<typeof spyOn>;
 let writeFileSyncSpy: ReturnType<typeof spyOn>;
+let renameSyncSpy: ReturnType<typeof spyOn>;
+let unlinkSyncSpy: ReturnType<typeof spyOn>;
 let consoleLogSpy: ReturnType<typeof mock>;
 let consoleErrorSpy: ReturnType<typeof mock>;
 let logOutput: string[];
@@ -49,6 +51,8 @@ beforeEach(async () => {
   const fsMod = await import("node:fs");
   mkdirSyncSpy = spyOn(fsMod, "mkdirSync").mockImplementation(() => undefined);
   writeFileSyncSpy = spyOn(fsMod, "writeFileSync").mockImplementation(() => undefined);
+  renameSyncSpy = spyOn(fsMod, "renameSync").mockImplementation(() => undefined);
+  unlinkSyncSpy = spyOn(fsMod, "unlinkSync").mockImplementation(() => undefined);
 
   logOutput = [];
   errorOutput = [];
@@ -61,6 +65,8 @@ beforeEach(async () => {
 afterEach(() => {
   mkdirSyncSpy.mockRestore();
   writeFileSyncSpy.mockRestore();
+  renameSyncSpy.mockRestore();
+  unlinkSyncSpy.mockRestore();
   console.log = globalThis.console.log;
   console.error = globalThis.console.error;
 });
@@ -94,7 +100,7 @@ describe("launchOpencode", () => {
     expect(opts.shell).toBe(process.platform === "win32");
   });
 
-  it("writes CURRENT_FILE with stack name and resolved dir", async () => {
+  it("writes CURRENT_FILE atomically with stack name and resolved dir", async () => {
     const { launchOpencode } = await import("../src/launch.ts");
     const spawner = new MockSpawner(() => fakeChild(0));
 
@@ -107,12 +113,18 @@ describe("launchOpencode", () => {
 
     // mkdirSync called (to ensure CURRENT_FILE parent dir exists)
     expect(mkdirSyncSpy).toHaveBeenCalled();
-    // writeFileSync called with CURRENT_FILE path containing stack name + dir
+    // writeFileSync called with .tmp path containing stack name + dir
     expect(writeFileSyncSpy).toHaveBeenCalled();
-    const [filePath, content] = writeFileSyncSpy.mock.calls[0]!;
-    expect(String(filePath)).toContain(".current");
+    const [tmpPath, content] = writeFileSyncSpy.mock.calls[0]!;
+    expect(String(tmpPath)).toContain(".current.tmp");
     expect(String(content)).toContain("my-stack");
     expect(String(content)).toContain("/resolved/dir");
+    // renameSync called to atomically move .tmp to .current
+    expect(renameSyncSpy).toHaveBeenCalled();
+    const [renameFrom, renameTo] = renameSyncSpy.mock.calls[0]!;
+    expect(String(renameFrom)).toContain(".current.tmp");
+    expect(String(renameTo)).toContain(".current");
+    expect(String(renameTo)).not.toContain(".tmp");
   });
 
   it("returns exit code from child process", async () => {
@@ -176,7 +188,8 @@ describe("launchOpencode", () => {
   it("DefaultSpawner.spawn delegates to child_process.spawn", async () => {
     const { DefaultSpawner } = await import("../src/launch.ts");
     const cpMod = await import("node:child_process");
-    const spawnSpy = spyOn(cpMod, "spawn").mockImplementation(() => fakeChild(0));
+    const spawnSpy = spyOn(cpMod, "spawn").mockImplementation((() =>
+      fakeChild(0)) as typeof cpMod.spawn);
 
     const spawner = new DefaultSpawner();
     const result = spawner.spawn("echo", ["hello"], { stdio: "pipe" });

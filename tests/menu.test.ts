@@ -47,7 +47,7 @@ describe("pickStack", () => {
     const result = await pickStack([], picker);
     expect(result).toBeNull();
     expect(picker.calledWith).toEqual([]);
-    expect(logOutput.join("\n")).toContain("Nenhuma stack em stacks/");
+    expect(logOutput.join("\n")).toContain("No stacks in stacks/");
   });
 
   it("delegates picker with exact stack names array", async () => {
@@ -135,7 +135,9 @@ describe("ReadlineStackPicker", () => {
     fsMod = await import("node:fs");
     stacksMod = await import("../src/stacks.ts");
     existsSyncSpy = spyOn(fsMod, "existsSync").mockImplementation(() => false);
-    readFileSyncSpy = spyOn(fsMod, "readFileSync").mockImplementation(() => "");
+    readFileSyncSpy = spyOn(fsMod, "readFileSync").mockImplementation(
+      (() => "") as unknown as typeof fsMod.readFileSync,
+    );
     loadStackSpy = spyOn(stacksMod, "loadStack").mockImplementation((name: string) => ({
       name,
       description: `Desc for ${name}`,
@@ -196,7 +198,7 @@ describe("ReadlineStackPicker", () => {
     const picker = new ReadlineStackPicker();
     const result = await picker.pick(["alpha", "beta"]);
     expect(result).toBeNull();
-    expect(logOutput.join("\n")).toContain("não corresponde");
+    expect(logOutput.join("\n")).toContain("does not match any stack");
   });
 
   it("returns null when input is whitespace only", async () => {

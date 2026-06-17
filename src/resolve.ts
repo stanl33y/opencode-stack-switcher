@@ -8,19 +8,37 @@ function getEnv(name: string): string | undefined {
   return process.env[name];
 }
 
+/**
+ * Recursively resolves `$VAR` and `${VAR}` references in a value against environment variables.
+ *
+ * Walks strings, arrays, and plain objects. Unresolved variables are kept
+ * as `${VAR}` markers so they can be identified later.
+ *
+ * @param value - The value to resolve (string, array, object, or primitive)
+ * @returns A copy of the value with all resolvable variable references replaced
+ *
+ * @example
+ * ```typescript
+ * process.env.TOKEN = "abc123";
+ * resolveEnvVars("Bearer $TOKEN"); // "Bearer abc123"
+ * ```
+ */
 export function resolveEnvVars<T>(value: T): T {
   if (typeof value === "string") {
     const match = /^\$\{?(\w+)\}?$/.exec(value.trim());
     if (match) {
       const envVal = getEnv(match[1]);
+      // SAFETY: envVal is string | undefined; T is constrained to the input type at the call site.
       if (envVal !== undefined) return envVal as T;
       // fallback: keep the marker if the var doesn't exist
       // but also try to resolve $VAR embedded in a larger string
     }
     // resolve $VAR or ${VAR} inside larger strings (e.g. "Bearer $TOKEN")
+    // SAFETY: replace() returns string; T is the original input type.
     return value.replace(/\$\{?(\w+)\}?/g, (_, name) => getEnv(name) ?? `\${${name}}`) as T;
   }
   if (Array.isArray(value)) {
+    // SAFETY: map preserves array structure; T is the original input type.
     return value.map(resolveEnvVars) as T;
   }
   if (isObject(value)) {
@@ -28,14 +46,14 @@ export function resolveEnvVars<T>(value: T): T {
     for (const [k, v] of Object.entries(value)) {
       out[k] = resolveEnvVars(v);
     }
+    // SAFETY: out mirrors the input object shape; T is the original input type.
     return out as T;
   }
   return value;
 }
 
-// Fixed set of oh-my-openagent agents/categories (extracted from current schema/config).
+/** Known oh-my-openagent agent names (used to build omo config). */
 export const OMO_AGENTS = [
-  "llama",
   "sisyphus",
   "hephaestus",
   "oracle",
@@ -47,8 +65,12 @@ export const OMO_AGENTS = [
   "momus",
   "atlas",
   "sisyphus-junior",
+  "build",
+  "OpenCode-Builder",
+  "plan",
 ] as const;
 
+/** Known oh-my-openagent category names (used to build omo config). */
 export const OMO_CATEGORIES = [
   "visual-engineering",
   "ultrabrain",
@@ -63,7 +85,19 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-/** Deep-merge: `override` wins; objects merge, arrays/scalars replace. */
+/**
+ * Deep-merges two objects. Override values win; objects merge recursively, arrays and scalars replace.
+ *
+ * @param base - The base configuration object
+ * @param override - The override configuration object (takes precedence)
+ * @returns A new merged object with override values taking precedence
+ *
+ * @example
+ * ```typescript
+ * deepMerge({ a: 1, b: { c: 2 } }, { b: { d: 3 } });
+ * // { a: 1, b: { c: 2, d: 3 } }
+ * ```
+ */
 export function deepMerge<T extends Record<string, unknown>>(
   base: T,
   override: Record<string, unknown>,
@@ -77,10 +111,19 @@ export function deepMerge<T extends Record<string, unknown>>(
       out[k] = v;
     }
   }
+  // SAFETY: out mirrors the merged shape of base + override; T is the input type.
   return out as T;
 }
 
-/** Builds oh-my-opencode.json from default_model + overrides. */
+/**
+ * Builds the oh-my-opencode.json configuration from a stack manifest.
+ *
+ * Fills in agent and category model assignments using the manifest's omo section,
+ * falling back to `default_model` where specific overrides are absent.
+ *
+ * @param manifest - The stack manifest to build config from
+ * @returns Complete oh-my-opencode configuration object
+ */
 export function buildOmoConfig(manifest: StackManifest): Record<string, unknown> {
   const omo = manifest.omo ?? {};
   const def = omo.default_model;
@@ -105,13 +148,31 @@ export function buildOmoConfig(manifest: StackManifest): Record<string, unknown>
   };
 }
 
+/** Result of resolving a stack manifest to disk. */
 export interface ResolveResult {
+  /** Absolute path to the resolved stack directory */
   dir: string;
+  /** Resolved opencode configuration (deep-merged with base) */
   opencode: Record<string, unknown>;
+  /** Generated oh-my-opencode configuration */
   omo: Record<string, unknown>;
 }
 
-/** Resolves a stack: writes resolved/<name>/{opencode.json,oh-my-opencode.json,package.json}. */
+/**
+ * Resolves a stack manifest: deep-merges with base config, builds omo config,
+ * resolves environment variables, and writes the result to disk.
+ *
+ * Creates `resolved/<name>/` with opencode.json, oh-my-opencode.json, and package.json.
+ *
+ * @param manifest - The stack manifest to resolve
+ * @returns ResolveResult with the output directory and resolved configurations
+ *
+ * @example
+ * ```typescript
+ * const manifest = loadStack("my-stack");
+ * const { dir, opencode, omo } = resolveStack(manifest);
+ * ```
+ */
 export function resolveStack(manifest: StackManifest): ResolveResult {
   const base = loadBase();
   const opencode = manifest.opencode ? deepMerge(base, manifest.opencode) : base;

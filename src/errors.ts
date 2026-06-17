@@ -27,6 +27,12 @@ export class OcsError extends Error {
    */
   readonly hint: string;
 
+  /**
+   * @param code - Unique error code identifier (e.g., "STACK_NOT_FOUND")
+   * @param exitCode - Numeric exit code for CLI usage
+   * @param message - Human-readable error message
+   * @param hint - Actionable hint for resolving the error
+   */
   constructor(code: string, exitCode: number, message: string, hint: string) {
     super(message);
     this.name = "OcsError";
@@ -43,6 +49,9 @@ export class OcsError extends Error {
 
 /**
  * Thrown when a requested stack does not exist.
+ *
+ * @param stackName - Name of the stack that was not found
+ * @param path - File path where the stack manifest was expected
  */
 export class StackNotFoundError extends OcsError {
   constructor(stackName: string, path: string) {
@@ -58,6 +67,8 @@ export class StackNotFoundError extends OcsError {
 
 /**
  * Thrown when stack configuration fails validation.
+ *
+ * @param message - Description of the validation failure
  */
 export class ConfigValidationError extends OcsError {
   constructor(message: string) {
@@ -83,6 +94,10 @@ export class BaseConfigMissingError extends OcsError {
 
 /**
  * Thrown when a health check times out during prelaunch.
+ *
+ * @param serviceName - Name or identifier of the service that timed out
+ * @param port - Port number the health check was targeting (0 for URL checks)
+ * @param timeoutMs - Total timeout duration in milliseconds
  */
 export class HealthCheckTimeoutError extends OcsError {
   constructor(serviceName: string, port: number, timeoutMs: number) {
@@ -98,6 +113,8 @@ export class HealthCheckTimeoutError extends OcsError {
 
 /**
  * Thrown when a required OpenCode plugin is not installed.
+ *
+ * @param pluginName - Name of the missing plugin
  */
 export class PluginNotInstalledError extends OcsError {
   constructor(pluginName: string) {
@@ -113,6 +130,9 @@ export class PluginNotInstalledError extends OcsError {
 
 /**
  * Thrown when a prelaunch service fails to spawn.
+ *
+ * @param serviceName - Name of the service that failed to spawn
+ * @param spawnError - Error message from the spawn failure
  */
 export class PrelaunchSpawnError extends OcsError {
   constructor(serviceName: string, spawnError: string) {
